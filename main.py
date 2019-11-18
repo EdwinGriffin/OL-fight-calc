@@ -1,59 +1,7 @@
 import character
 import encounters
 import inflect
-
-def explode(result, die):
-    '''Takes a rolled value, and the face total of a die roll, checks to see if it explodes, and returns the result of the explosion as a string'''
-
-    if result == die:
-        return str(result) + ' + ' + str(explode(random.randint(1, die), die))
-    else:
-        return result
-
-def roll(num, die, adv = 0):
-    '''Rolls a given die, num, number of times, checking for explosions and allowing for adv/disadvantage'''
-    
-    #Unsure of input type, so all converted to ints.
-    num = int(num)
-    die = int(die)
-    adv = int(adv)
-    
-    roll_list = []
-
-    #Create the random values for the roll (inc. adv/dis)
-    for i in range(0, num + abs(adv)):
-        roll_list.append(random.randint(1, die))
-    current = roll_list.copy()
-    
-    #Check to see if there is advantage or disadvantage, and subtract the appropriate values
-    if adv > 0:
-        roll_list.sort()
-    elif adv < 0:
-        roll_list.sort(reverse=True)
-    final_roll_list = [explode(x, die) for x in roll_list[abs(adv)::]]
-    
-    #Checks to see if an explosion happened and a string was returned, handles it, then returns a tuple containing the results at various stages
-    output = 0
-    for v in final_roll_list:
-        if type(v) is str:
-            output += eval(v)
-        else:
-            output += v
-    return (current, final_roll_list, output)
-
-def parse_dice(text):
-    '''Checks to see if adv/disadvantage is required, then passes the correct values to roll()'''
-    if 'adv' in text:
-        dice, adv = text.split('adv')
-        num, die = dice.split('d')
-        return roll(num, die, adv)
-    elif 'dis' in text:
-        dice, adv = text.split('dis')
-        num, die = dice.split('d')
-        return roll(num, die, -int(adv))
-    else:
-        num, die = text.split('d')
-        return roll(num, die)
+import csv
 
 def get_number_input(text, repeat=False):
     if not repeat:
@@ -66,22 +14,69 @@ def get_number_input(text, repeat=False):
         print('-----\nPlease enter a number')
         return get_number_input(text, repeat = True)
 
-if __name__ == "__main__":
-    p = inflect.engine()
-    encounter = encounters.Encounter()
-    mode = get_number_input("Enter a number:\n1. File\n2. User Entry")
-    while mode not in [1, 2]:
-        print('Mode must be 1 or 2.')
-        mode = get_number_input("1. File\n2. User Entry")
-    if mode == 1:
-        #TODO
-        print('TODO')
-    elif mode == 2:
-        encounter.no_enemies = get_number_input('Number of enemies:')
-        encounter.no_players = get_number_input('Number of players:')
-        for i in range(1, encounter.no_enemies + 1):
-            enemy_level = get_number_input('What level is the ' + p.number_to_words(p.ordinal(i)) + ' enemy?')
-            enemy_type = get_number_input('What type is the ' + p.number_to_words(p.ordinal(i)) + ' enemy?\n1. Attacker\n2. Buffer\n3. Debuffer')
-            encounter.enemies.append(character.NPC(enemy_level, enemy_type))
-    for enemy in encounter.enemies:
-        print(enemy)
+if __name__ == "__main__":    
+    
+    finished = False
+    
+    while not finished:
+        #initialisation
+        p = inflect.engine()
+        encounter = encounters.Encounter()
+        
+        #Check which mode to use
+        mode = get_number_input("Enter a number:\n1. File\n2. User Entry")
+        while mode not in [1, 2]:
+            print('Mode must be 1 or 2.')
+            mode = get_number_input("1. File\n2. User Entry")
+        
+        #File initialisation statements
+        if mode == 1:
+            team = get_number_input('Which team is fighting?\n1. Fortune\n2. Noble\n3. Dauntless\n4. Valiant')
+            teams = {1:'fortune', 2:'noble', 3:'dauntless', 4:'valiant'}
+            
+            #Generate players
+            with open(teams[team] + '.csv') as players_file:
+                reader = csv.reader(players_file)
+                next(reader, None)
+                for row in reader:
+                    encounter.players.append(character.Player(row[0], int(row[1]), row[2], int(row[3]), int(row[4]), int(row[5]), int(row[6]), int(row[7]), int(row[8]), int(row[9]), int(row[10]), int(row[11])))
+            
+            #Generate enemies
+            with open('enemies.csv') as enemies_file:
+                reader = csv.reader(enemies_file)
+                next(reader, None)
+                for row in reader:
+                    encounter.enemies.append(character.NPC(row[0], int(row[1]), int(row[2])))
+        
+        #Manual initialisation statements
+        elif mode == 2:
+            encounter.no_enemies = get_number_input('Number of enemies:')
+            encounter.no_players = get_number_input('Number of players:')
+            for i in range(1, encounter.no_enemies + 1):
+                enemy_level = get_number_input('What level is the ' + p.number_to_words(p.ordinal(i)) + ' enemy?')
+                enemy_role = get_number_input('What role does the ' + p.number_to_words(p.ordinal(i)) + ' enemy play?\n1. Attacker\n2. Buffer\n3. Debuffer')
+                encounter.enemies.append(character.NPC(enemy_level, enemy_role))
+            for enemy in encounter.enemies:
+                print(enemy)
+        
+        start = get_number_input("Begin Encounter?\n1. Yes\n2. No")
+        while start != 1:
+            start = get_number_input("Begin Encounter?\n1. Yes\n2. No")
+        
+        encounter.play()
+
+        repeat = get_number_input("Repeat Encounter?\n1. Yes\n2. No")
+        while repeat:
+            while repeat not in [1,2]:
+                repeat = get_number_input("Begin Encounter?\n1. Yes\n2. No")
+            if repeat == 1:
+                encounter.play()
+            if repeat == 2:
+                repeat = False
+        
+        finished = get_number_input("Restart or quit?\n1. Restart\n2. Quit")
+        while finished not in [1,2]:
+            finished = get_number_input("Restart or quit?\n1. Restart\n2. Quit")
+        if finished == 1:
+            finished = False
+    print('Finished')
