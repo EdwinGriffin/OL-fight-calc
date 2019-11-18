@@ -3,20 +3,25 @@ class Character:
     def __init__(self):
         pass
 
-    def attack(self, target):
+    def attack(self, players, enemies):
         pass
 
-    def defend(self, attack, target):
+    def defend(self, players, enemies, attack):
         pass
 
-    def buff(self, target):
+    def buff(self, players, enemies):
         pass
 
-    def debuff(self, target):
+    def debuff(self, players, enemies):
         pass
 
     def update(self, players, enemies):
-        return 'TODO'
+        if self.role == 'attacker':
+            self.attack(players, enemies)
+        elif self.role == 'buffer':
+            self.attack(players, enemies)
+        elif self.role == 'debuffer':
+            self.attack(players, enemies)
 
     def __str__(self):
         output = self.name + ", a level " + str(self.level) + " " + self.role + " has:\n" \

@@ -4,7 +4,7 @@ attributes = {0:'', 1:'1d4', 2:'1d6', 3:'1d8', 4:'1d10', 5:'2d6', 6:'2d8', 7:'2d
 
 def attr_roll(attr, bonus):
     #initialise the roll list with a d20 roll
-    roll_list = [random.randint(1, 20)]
+    roll_list = [(random.randint(1, 20), 20)]
     attr = attributes[attr]
 
     #check if the attr used is a non 0 value and add the appropriate rolls in
@@ -14,19 +14,19 @@ def attr_roll(attr, bonus):
         die = int(die)
 
         for i in range(0, num + abs(bonus)):
-            roll_list.append(random.randint(1, die))
+            roll_list.append((random.randint(1, die), die))
     else:
         if bonus:
-            roll_list.append(random.randint(1, 20))
+            roll_list.append((random.randint(1, 20),20))
 
     current = roll_list.copy()
 
     #Check to see if there is advantage or disadvantage, and subtract the appropriate values
     if bonus > 0:
-        roll_list.sort()
+        roll_list.sort(key=lambda x: x[0])
     elif bonus < 0:
-        roll_list.sort(reverse=True)
-    final_roll_list = [explode(x, die) for x in roll_list[abs(bonus)::]]
+        roll_list.sort(key=lambda x: x[0], reverse=True)
+    final_roll_list = [explode(x[0], x[1]) for x in roll_list[abs(bonus)::]]
 
     #Checks to see if an explosion happened and a string was returned, handles it, then returns a tuple containing the results at various stages
     output = 0
