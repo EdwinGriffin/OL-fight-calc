@@ -51,19 +51,6 @@ if __name__ == "__main__":
             start = get_number_input("Begin Encounter?\n1. Yes\n2. No")
         
         encounter.play()
-
-        #Allow a repeat of the encounter, could be repeated to check for variance/consistency of result
-        repeat = True
-        while repeat:
-            repeat = get_number_input("Repeat Encounter?\n1. Yes\n2. No")
-            while repeat not in [1,2]:
-                repeat = get_number_input("Repeat Encounter?\n1. Yes\n2. No")
-            if repeat == 1:
-                encounter.players = players.copy()
-                encounter.enemies = enemies.copy()
-                encounter.play()
-            if repeat == 2:
-                repeat = False
         
         #Check if the simulations performed so far are sufficient, or if you want to run a new one from scratch
         finished = get_number_input("Restart or quit?\n1. Restart\n2. Quit")

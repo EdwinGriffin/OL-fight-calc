@@ -1,3 +1,5 @@
+import dice
+
 class Character:
 
     def __init__(self):
@@ -6,8 +8,32 @@ class Character:
     def attack(self, allies, enemies):
         #Identify weakest enemy
         #Attack weakest enemy
+        target = False
+        for enemy in enemies:
+            if target:
+                if target.guard > enemy.guard and enemy.unconscious == False:
+                    target = enemy
+            if enemy.unconscious == False:
+                target = enemy
+        if target == False:
+            return
         print(self.name, 'is an attacker')
-        pass
+        print(self.name, 'has selected', target.name, 'as their target as they look the weakest')
+        attack_roll = dice.attr_roll(self.offensive, self.bonus)
+        print(self.name, 'attacks', target.name, 'with:', attack_roll)
+        if attack_roll.total > target.guard:
+            damage = max(3, attack_roll.total - target.guard)
+            target.current_hp -= damage
+            print(target.name, 'has a guard of', target.guard, 'so the attack hits and', str(target.name) + "'s health is reduced by", damage, 'to', target.current_hp)
+            if target.current_hp <= 0 and abs(target.current_hp) >= target.max_hp:
+                target.unconscious = True
+                target.dead = True
+                print(target.name, 'is dead')
+            elif target.current_hp <= 0:
+                target.unconscious = True
+                print(target.name, 'is unconscious')
+        else:
+            print(self.name, 'was unable to effectively strike', target.name)
 
     def defend(self, allies, enemies, origin, attack):
         #If the resolution of an attack action would bring a target below 0 hp, target will attempt a defend action
@@ -30,12 +56,18 @@ class Character:
         pass
 
     def update(self, allies, enemies):
-        if self.role == 'attacker':
-            self.attack(allies, enemies)
-        elif self.role == 'buffer':
-            self.buff(allies, enemies)
-        elif self.role == 'debuffer':
-            self.debuff(allies, enemies)
+        if not self.unconscious and not self.dead:
+            if self.role == 'attacker':
+                self.attack(allies, enemies)
+            elif self.role == 'buffer':
+                self.buff(allies, enemies)
+            elif self.role == 'debuffer':
+                self.debuff(allies, enemies)
+        elif self.dead:
+            print(self.name, 'is dead')
+        elif self.unconscious:
+            print(self.name, 'is unconscious')
+        #input('-----\nPress enter to continue...')
 
     def __str__(self):
         output = self.name + ", a level " + str(self.level) + " " + self.role + " has:\n" \
@@ -69,6 +101,8 @@ class Player(Character):
         self.resolve = resolve
         self.bonus = bonus
         self.interrupt = False
+        self.unconscious = False
+        self.dead = False
 
 class NPC(Character):
     
@@ -82,7 +116,9 @@ class NPC(Character):
         self.current_hp = int(14 + (self.level * 2))
         self.guard = int(12 + self.level)
         self.bonus = 1
-        self.interrupt = False        
+        self.interrupt = False
+        self.unconscious = False
+        self.dead = False        
 
         if self.role == 1:
             self.role = 'attacker'
