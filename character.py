@@ -3,25 +3,28 @@ class Character:
     def __init__(self):
         pass
 
-    def attack(self, players, enemies):
+    def attack_action(self, players, enemies):
+        print(self.name, 'is an attacker')
         pass
 
-    def defend(self, players, enemies, attack):
+    def defend_action(self, players, enemies, attack):
         pass
 
-    def buff(self, players, enemies):
+    def buff_action(self, players, enemies):
+        print(self.name, 'is a buffer')
         pass
 
-    def debuff(self, players, enemies):
+    def debuff_action(self, players, enemies):
+        print(self.name, 'is a debuffer')
         pass
 
     def update(self, players, enemies):
         if self.role == 'attacker':
-            self.attack(players, enemies)
+            self.attack_action(players, enemies)
         elif self.role == 'buffer':
-            self.attack(players, enemies)
+            self.buff_action(players, enemies)
         elif self.role == 'debuffer':
-            self.attack(players, enemies)
+            self.debuff_action(players, enemies)
 
     def __str__(self):
         output = self.name + ", a level " + str(self.level) + " " + self.role + " has:\n" \
