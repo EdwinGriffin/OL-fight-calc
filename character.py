@@ -3,36 +3,47 @@ class Character:
     def __init__(self):
         pass
 
-    def attack_action(self, players, enemies):
+    def attack(self, allies, enemies):
+        #Identify weakest enemy
+        #Attack weakest enemy
         print(self.name, 'is an attacker')
         pass
 
-    def defend_action(self, players, enemies, attack):
+    def defend(self, allies, enemies, origin, attack):
+        #If the resolution of an attack action would bring a target below 0 hp, target will attempt a defend action
+        print(self.name, 'is attempting a defend action against', origin.name, 'with an attack of', attack)
+        self.interrupt = True
         pass
 
-    def buff_action(self, players, enemies):
+    def buff(self, allies, enemies):
+        #Check if ally needs healing (<50%?)
+        #Check if any allies are attackers or debuffers, buff if they are (prioritise attackers)
+        #Attack if no allies are attackers or debuffers
         print(self.name, 'is a buffer')
         pass
 
-    def debuff_action(self, players, enemies):
+    def debuff(self, allies, enemies):
+        #Check if any allies are attackers, if none attack weakest enemy, otherwise:
+        #Identify strongest enemy
+        #Debuff enemy
         print(self.name, 'is a debuffer')
         pass
 
-    def update(self, players, enemies):
+    def update(self, allies, enemies):
         if self.role == 'attacker':
-            self.attack_action(players, enemies)
+            self.attack(allies, enemies)
         elif self.role == 'buffer':
-            self.buff_action(players, enemies)
+            self.buff(allies, enemies)
         elif self.role == 'debuffer':
-            self.debuff_action(players, enemies)
+            self.debuff(allies, enemies)
 
     def __str__(self):
         output = self.name + ", a level " + str(self.level) + " " + self.role + " has:\n" \
             "Initiative Stat: " + str(self.init) + "\n" \
             "Offensive Stat: " + str(self.offensive) + "\n" \
             "Defensive Stat: " + str(self.defensive) + "\n" \
-            "Buffing Stat: " + str(self.buff) + "\n" \
-            "Debuffing Stat: " + str(self.debuff) + "\n" \
+            "Buffing Stat: " + str(self.buffing) + "\n" \
+            "Debuffing Stat: " + str(self.debuffing) + "\n" \
             "Max Hit Points: " + str(self.max_hp) + "\n" \
             "Current Hit Points: " + str(self.current_hp) + "\n" \
             "Guard: " + str(self.guard) + "\n" \
@@ -43,21 +54,21 @@ class Character:
 
 class Player(Character):
     
-    def __init__(self, name, level, role, init, offensive, defensive, buff, debuff, hp, guard, resolve, bonus):
+    def __init__(self, name, level, role, init, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus):
         self.name = name
         self.level = level
         self.role = role
         self.init = init
         self.offensive = offensive
         self.defensive = defensive
-        self.buff = buff
-        self.debuff = debuff
+        self.buffing = buffing
+        self.debuffing = debuffing
         self.max_hp = hp
         self.current_hp = hp
         self.guard = guard
         self.resolve = resolve
         self.bonus = bonus
-        self.has_allies = False
+        self.interrupt = False
 
 class NPC(Character):
     
@@ -71,29 +82,29 @@ class NPC(Character):
         self.current_hp = int(14 + (self.level * 2))
         self.guard = int(12 + self.level)
         self.bonus = 1
-        self.has_allies = False
+        self.interrupt = False        
 
         if self.role == 1:
             self.role = 'attacker'
             self.init = self.primary
             self.offensive = self.primary
             self.defensive = self.primary
-            self.buff = self.secondary
-            self.debuff = self.secondary
+            self.buffing = self.secondary
+            self.debuffing = self.secondary
             self.resolve = int(self.guard * 0.75)
         if self.role == 2:
             self.role = 'buffer'
             self.init = self.secondary
             self.offensive = self.secondary
             self.defensive = self.primary
-            self.buff = self.primary
-            self.debuff = self.secondary
+            self.buffing = self.primary
+            self.debuffing = self.secondary
             self.resolve = int(self.guard * 0.9)
         if self.role == 3:
             self.role = 'debuffer'
             self.init = self.secondary
             self.offensive = self.primary
             self.defensive = self.secondary
-            self.buff = self.secondary
-            self.debuff = self.primary
+            self.buffing = self.secondary
+            self.debuffing = self.primary
             self.resolve = self.guard

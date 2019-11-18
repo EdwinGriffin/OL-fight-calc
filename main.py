@@ -57,7 +57,7 @@ if __name__ == "__main__":
         while repeat:
             repeat = get_number_input("Repeat Encounter?\n1. Yes\n2. No")
             while repeat not in [1,2]:
-                repeat = get_number_input("Begin Encounter?\n1. Yes\n2. No")
+                repeat = get_number_input("Repeat Encounter?\n1. Yes\n2. No")
             if repeat == 1:
                 encounter.players = players.copy()
                 encounter.enemies = enemies.copy()

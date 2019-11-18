@@ -30,10 +30,16 @@ class Encounter:
             #iterate through initiative list, if they're conscious, update them
             for entry in self.initiative_order:
                 character = entry[0]
-                if character in self.conscious_players or character in self.enemies:
+                
+                #Check if the character can take an action, then determine who their allies and enemies are
+                if character.interrupt:
+                    character.interrupt = False
+                    continue
+                elif character in self.conscious_players:
                     character.update(self.players, self.enemies)
-                    # if character in self.enemies:
-                    #     self.enemies.remove(character)
-                    if len(self.enemies) == 0 or len(self.conscious_players) == 0:
-                        finished = True
-                        break
+                elif character in self.enemies:
+                    character.update(self.enemies, self.players)
+                
+                if len(self.enemies) == 0 or len(self.conscious_players) == 0:
+                    finished = True
+                    break
