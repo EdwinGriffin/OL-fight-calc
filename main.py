@@ -29,16 +29,16 @@ if __name__ == "__main__":
         
         #Generate players
         players = []
-        with open(teams[team] + '.csv') as players_file:
+        with open('data/' + teams[team] + '.csv') as players_file:
             reader = csv.reader(players_file)
             next(reader, None)
             for row in reader:
-                players.append(character.Player(row[0], int(row[1]), row[2], int(row[3]), int(row[4]), int(row[5]), int(row[6]), int(row[7]), int(row[8]), int(row[9]), int(row[10]), int(row[11])))
+                players.append(character.Player(row[0], int(row[1]), row[2], int(row[3]), int(row[4]), int(row[5]), int(row[6]), int(row[7]), int(row[8]), int(row[9]), int(row[10]), int(row[11]), int(row[12])))
         encounter.players = players.copy()
         
         #Generate enemies
         enemies = []
-        with open('enemies.csv') as enemies_file:
+        with open('data/enemies.csv') as enemies_file:
             reader = csv.reader(enemies_file)
             next(reader, None)
             for row in reader:

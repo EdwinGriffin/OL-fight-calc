@@ -1,5 +1,0 @@
-name, level, role, init, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus
-Grue, 2,debuffer, 0, 5, 3, 3, 5, 26, 17, 15, 1
-Blockade, 2,buffer, 3, 5, 5, 5, 0, 24, 21, 14, 2
-Lockstep, 2,attacker, 5, 5, 5, 5, 0, 20, 19, 13, 2
-Fulcrum, 2,attacker, 3, 5, 3, 0, 0, 34, 20, 18, 3

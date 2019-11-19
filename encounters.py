@@ -32,29 +32,39 @@ class Encounter:
             #iterate through initiative list, if they're conscious, update them
             for turn, entry in enumerate(self.initiative_order):
                 print('-----')
-                print('Round:', rnd, 'Turn:', turn+1)
+                print('Round:', str(rnd) + ',', 'Turn:', turn+1)
                 character = entry[0]
-                #Check if the character can take an action, then determine who their allies and enemies are
-                if character.interrupt:
-                    character.interrupt = False
-                    continue
-                if character.unconscious or character.dead:
-                    if character in self.conscious_enemies:
-                        self.conscious_enemies.remove(character)
-                    if character in self.conscious_players:
-                        self.conscious_players.remove(character)
-                if len(self.conscious_enemies) == 0 or len(self.conscious_players) == 0:
-                    finished = True
-                    break
+                
+                #Take character actions (update method handles consciousness)
                 if character in self.players:
                     character.update(self.players, self.enemies)
                 if character in self.enemies:
                     character.update(self.enemies, self.players)
                 
+                #After character actions, check consciousness
+                for character in (self.conscious_enemies + self.conscious_players):
+                    if character.unconscious or character.dead:
+                        if character in self.conscious_enemies:
+                            self.conscious_enemies.remove(character)
+                        if character in self.conscious_players:
+                            self.conscious_players.remove(character)
+                
+                #Check if there are any opposing combatants left
+                if len(self.conscious_enemies) == 0 or len(self.conscious_players) == 0:
+                    print('-----')
+                    print('No more conscious opposing combatants')
+                    print('-----')
+                    finished = True
+                    break
+            print('Round', rnd, 'has finished. Current situation:\n')
             print('Players remaining:')
             for character in self.players:
-                print(str(character.name) + ': with', character.current_hp, 'remaining.')
+                new_max = character.max_hp - character.lethal
+                print('\t', str(character.name) + ': with', str(character.current_hp) + '/' + str(new_max), 'hp remaining.', character.lethal, 'lethal damage suffered.', 'Character is dead' if character.dead else '')
             print('Enemies remaining:')
             for character in self.enemies:
-                print(str(character.name) + ': with', character.current_hp, 'remaining.')
+                new_max = character.max_hp - character.lethal
+                print('\t', str(character.name) + ': with', str(character.current_hp) + '/' + str(new_max), 'hp remaining.', character.lethal, 'lethal damage suffered.', 'Character is dead' if character.dead else '')
+            print('-----')
+            #input('Press enter to continue...') if not finished else print()
             rnd += 1
