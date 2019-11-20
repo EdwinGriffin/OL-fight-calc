@@ -1,7 +1,9 @@
 name, level, role (1 = attacker; 2 = buffer; 3 = debuffer)
-Rioter1, 1, 1
-Rioter2, 1, 1
-Rioter3, 1, 1
-Rioter4, 1, 1
-Rioter5, 1, 1
-Rioter6, 1, 1
+Rioter1, 2, 1
+Rioter1, 2, 1
+Rioter1, 2, 1
+Rioter1, 2, 1
+Rioter1, 1, 2
+Rioter1, 1, 2
+Rioter1, 1, 3
+Rioter1, 1, 3

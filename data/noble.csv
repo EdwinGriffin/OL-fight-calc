@@ -1,0 +1,5 @@
+name, level, role, init, fort, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus, lethal
+Ghost, 2,attacker, 4, 2, 5, 4, 0, 5, 24, 24, 15, 1, 0
+Apollo, 2,buffer, 5, 3, 5, 5, 5, 0, 24, 19, 14, 3, 0
+Prodigy, 2,attacker, 2, 2, 5, 5, 5, 5, 22, 15, 14, 3, 0
+Titan, 2,buffer, 3, 5, 3, 5, 5, 0, 30, 26, 15, 1, 0

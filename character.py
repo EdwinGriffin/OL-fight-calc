@@ -23,22 +23,35 @@ class Character:
         self.lethal = 0
         self.buffed = False
         self.debuffed = False
+        self.attack_priority = -1000
 
     def attack(self, allies, enemies):
         #Identify weakest enemy
         #Attack weakest enemy
         target = Character('empty')
         for enemy in enemies:
-            if target:
-                if target.guard > enemy.guard and enemy.unconscious == False:
+            if not enemy.unconscious:
+                enemy.attack_priority = 0
+                #Attack priority calculations
+                enemy.attack_priority += 40/enemy.guard
+                enemy.attack_priority += 30/enemy.current_hp
+                #Add half their offensive stat to their priority, starting at 4
+                enemy.attack_priority += max(0, (enemy.offensive/2) - 2)
+                #Add half their bonus stat to their priority
+                enemy.attack_priority += enemy.bonus/2    
+            
+                if enemy.attack_priority > target.attack_priority:
                     target = enemy
-            if enemy.unconscious == False and target.name == 'empty':
-                target = enemy
+                
+                if type(self) is NPC:
+                   if enemy.current_hp > target.current_hp:
+                       target = enemy
+
         if target.name == 'empty':
             print('There are no more targets')
             return
 
-        print(self.name, 'has selected', target.name, 'as their target as they look the weakest')
+        print(self.name, 'has selected', target.name, 'as their target as they have the highest priority of', round(target.attack_priority,2))
         attack_roll = dice.attr_roll(self.offensive, self.bonus)
         print(self.name, 'attacks', target.name, 'with:', attack_roll)
         if attack_roll.total > target.guard:
@@ -51,7 +64,8 @@ class Character:
             #A defend will be attempted if the attack will unconscious the target, if there is at least 10 lethal damage, or if the attack is 50% of current health and health is above 15
             if (target.current_hp - damage) <= 0 or attack_roll.lethal >= 10 or ((target.current_hp - damage) < int(target.current_hp/2) and target.max_hp > 15):
                 if not target.interrupt:
-                    defend_attempt = target.defend(enemies, allies, self, attack_roll.total, attack_roll.lethal)
+                    if type(target) is Player:
+                        defend_attempt = target.defend(enemies, allies, self, attack_roll.total, attack_roll.lethal)
             #If no defend attempt is made or the attempt fails
             if not defend_attempt:
                 target.lethal += attack_roll.lethal
@@ -135,12 +149,13 @@ class Character:
         buff_priority = []
 
         for player in allies:
-            if player.unconscious and not player.dead and player.lethal < player.max_hp:
-                unconscious.append(player)
-            elif (player.current_hp < (player.max_hp - player.lethal)/2):
-                heal_priority.append(player)
-            elif not player.buffed and not player.interrupt and player.role == 'attacker':
-                buff_priority.append(player)
+            if not player.dead:
+                if player.unconscious and player.lethal < player.max_hp:
+                    unconscious.append(player)
+                elif (player.current_hp < (player.max_hp - player.lethal)/2):
+                    heal_priority.append(player)
+                elif not player.buffed and not player.interrupt and player.role == 'attacker' and not player.unconscious:
+                    buff_priority.append(player)
 
         if unconscious:
             unconscious.sort(key=lambda x: x.lethal)
@@ -149,16 +164,18 @@ class Character:
                 if self.buffing - i >= 0 and buff_roll.total >= 10 + (i * 2):
                     if buff_roll.total >= 20 + (i * 2):
                         heal_roll = dice.attr_roll(i + 1, 0, True)
+                        print('Exceptional Success!', end=' ')
                     else:
                         heal_roll = dice.attr_roll(i, 0, True)
+                        print('Success!', end=' ')
                     unconscious[0].unconscious = False
                     unconscious[0].current_hp += heal_roll.total
                     new_max = unconscious[0].max_hp - unconscious[0].lethal
                     if unconscious[0].current_hp > new_max:
                         unconscious[0].current_hp = new_max
-                    print('Success!', heal_roll, '\n' + unconscious[0].name, 'is conscious and gains', str(heal_roll.total) + 'hp. They are now on', str(unconscious[0].current_hp) + '/' + str(new_max))
+                    print(heal_roll, '\n' + unconscious[0].name, 'is conscious and gains', str(heal_roll.total) + 'hp. They are now on', str(unconscious[0].current_hp) + '/' + str(new_max))
                     return
-            print('The attempt is unsuccessful')
+            print('The attempt was unsuccessful')
         elif heal_priority:
             heal_priority.sort(key=lambda x: x.guard)
             print(self.name, 'is attempting to heal', heal_priority[0].name, 'with:', buff_roll)
@@ -166,15 +183,17 @@ class Character:
                 if self.buffing - i >= 0 and buff_roll.total >= 10 + (i * 2):
                     if buff_roll.total >= 20 + (i * 2):
                         heal_roll = dice.attr_roll(i + 1, 0, True)
+                        print('Exceptional Success!', end=' ')
                     else:
                         heal_roll = dice.attr_roll(i, 0, True)
+                        print('Success!', end=' ')
                     heal_priority[0].current_hp += heal_roll.total
                     new_max = heal_priority[0].max_hp - heal_priority[0].lethal
                     if heal_priority[0].current_hp > new_max:
                         heal_priority[0].current_hp = new_max
-                    print('Success!', heal_roll, '\n' + heal_priority[0].name, 'is healed and gains', str(heal_roll.total) + 'hp. They are now on', str(heal_priority[0].current_hp) + '/' + str(new_max))
+                    print(heal_roll, '\n' + heal_priority[0].name, 'is healed and gains', str(heal_roll.total) + 'hp. They are now on', str(heal_priority[0].current_hp) + '/' + str(new_max))
                     return
-            print('The attempt is unsuccessful')
+            print('The attempt was unsuccessful')
         elif buff_priority:
             buff_priority.sort(key=lambda x: x.offensive)
             print(self.name, 'is attempting to buff', buff_priority[0].name, 'with:', buff_roll)
@@ -183,20 +202,56 @@ class Character:
                     buff_priority[0].buffed = True
                     if buff_roll.total >= 20 + (i * 2):
                         buff_priority[0].bonus += int(self.buffing/i) + 1
+                        print('Exceptional Success!', end=' ')
                     else:
                         buff_priority[0].bonus += int(self.buffing/i)
-                    print('Success!', buff_priority[0].name, 'is buffed and now has a bonus of', buff_priority[0].bonus)
+                        print('Success!', end=' ')
+                    print(buff_priority[0].name, 'is buffed and now has a bonus of', buff_priority[0].bonus)
                     return
-            print('The attempt is unsuccessful')
+            print('The attempt was unsuccessful')
         else:
             print(self.name, 'has no characters to heal/buff so they will attack')
             self.attack(allies, enemies)
 
     def debuff(self, allies, enemies):
-        #Check if any allies are attackers, if none attack weakest enemy, otherwise:
-        #Identify strongest enemy
-        #Debuff enemy
-        pass
+        #Get debuff roll and initialise priority lists
+        debuff_roll = dice.attr_roll(self.debuffing, self.bonus)
+        debuff_priority = []
+        friendly_attackers = []
+
+        #Build priority list for enemies
+        for enemy in enemies:
+            if enemy.role == 'attacker' and not enemy.debuffed and not enemy.unconscious:
+                debuff_priority.append(enemy)
+        
+        #Check to see if there are any attackers on your team, otherwise attacking has a higher priority
+        for ally in allies:
+            if ally.role == 'attacker' and not ally.unconscious:
+                friendly_attackers.append(ally)
+        
+        if not friendly_attackers:
+            debuff_priority = []
+
+        #Debuff the highest priority target
+        if debuff_priority:
+            debuff_priority.sort(key=lambda x: x.offensive)
+            target = debuff_priority[0]
+            print(self.name, 'is attempting to debuff', target.name, 'with:', debuff_roll)
+            if debuff_roll.total >= target.resolve:
+                if debuff_roll.total >= target.resolve + 10:
+                    target.bonus -= int(self.debuffing/3) + 1
+                    target.debuffed = True
+                    print('Exceptional Success!', target.name + "'s bonus has been reduced to", target.bonus)
+                else:
+                    target.bonus -= int(self.debuffing/3)
+                    target.debuffed = True
+                    print('Success!', target.name + "'s bonus has been reduced to", target.bonus)
+            else:
+                print('The attempt was unsuccessful')
+        #Attack otherwise
+        else:
+            print(self.name, 'has no characters to debuff so they will attack')
+            self.attack(allies, enemies)
 
     def update(self, allies, enemies):
         if self.dead:
@@ -238,7 +293,7 @@ class Character:
 
 class Player(Character):
     
-    def __init__(self, name, level, role, init, fort, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus):
+    def __init__(self, name, level, role, init, fort, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus, lethal):
         self.name = name
         self.level = level
         self.role = role
@@ -249,8 +304,8 @@ class Player(Character):
         self.buffing = buffing
         self.debuffing = debuffing
         self.max_hp = hp
-        self.current_hp = hp
-        self.lethal = 0
+        self.lethal = lethal
+        self.current_hp = hp - lethal
         self.guard = guard
         self.resolve = resolve
         self.bonus = bonus
@@ -259,6 +314,7 @@ class Player(Character):
         self.dead = False
         self.buffed = False
         self.debuffed = False
+        self.attack_priority = 0
 
 class NPC(Character):
     
@@ -273,12 +329,13 @@ class NPC(Character):
         self.current_hp = int(14 + (self.level * 2))
         self.lethal = 0
         self.guard = int(12 + self.level)
-        self.bonus = 1
+        self.bonus = int(self.level/3)
         self.interrupt = False
         self.unconscious = False
         self.dead = False        
         self.buffed = False
         self.debuffed = False
+        self.attack_priority = 0
 
         if self.role == 1:
             self.role = 'attacker'

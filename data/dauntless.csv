@@ -1,5 +1,5 @@
-name, level, role, init, fort, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus
-Grue, 2,buffer, 0, 3, 5, 3, 3, 5, 26, 17, 15, 1
-Blockade, 2,buffer, 3, 3, 5, 5, 5, 0, 24, 21, 14, 2
-Lockstep, 2,buffer, 5, 2, 5, 5, 5, 0, 20, 19, 13, 2
-Fulcrum, 2,buffer, 3, 4, 5, 3, 0, 0, 34, 20, 18, 3
+name, level, role, init, fort, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus, lethal
+Grue, 2,debuffer, 3, 3, 5, 3, 3, 5, 26, 17, 15, 3, 0
+Blockade, 2,buffer, 3, 3, 5, 5, 5, 0, 24, 21, 14, 3, 0
+Lockstep, 2,attacker, 5, 2, 5, 5, 5, 0, 20, 19, 13, 3, 0
+Fulcrum, 2,attacker, 3, 4, 5, 3, 0, 0, 34, 20, 18, 3, 1

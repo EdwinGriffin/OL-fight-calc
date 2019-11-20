@@ -3,13 +3,15 @@ import random
 attributes = {0:'', 1:'1d4', 2:'1d6', 3:'1d8', 4:'1d10', 5:'2d6', 6:'2d8', 7:'2d10', 8:'3d8', 9:'3d10'}
 
 class Roll:
-    def __init__(self, num, bonus, original, exploded, total):
+    def __init__(self, num, bonus, original, exploded, total, no_20):
         self.original = original
         self.exploded = exploded
         self.total = total
         self.verbose_orig = []
         self.lethal = 0
         self.num = str(num)
+        self.no_20 = no_20
+
         if bonus > 0:
             self.bonus = " adv " + str(bonus) + ' '
         elif bonus < 0:
@@ -23,7 +25,7 @@ class Roll:
                 self.verbose_orig = '1d20' + self.bonus + '[' + str(original[0][0]) + ', ' + str(original[1][0]) + ']'
             #otherwise adv was applied to the attr dice, so represent that in a string
             else:
-                self.verbose_orig = '1d20' + '[' + str(original[0][0])+ '] + '
+                self.verbose_orig = '1d20' + '[' + str(original[0][0])+ '] + ' if not no_20 else ''
                 output = []
                 for value in original[1:]:
                     output.append(value[0])
@@ -97,7 +99,7 @@ def attr_roll(attr, bonus, no_20=False):
             output += eval(v)
         else:
             output += v
-    roll = Roll(num, bonus, current, final_roll_list, output)
+    roll = Roll(num, bonus, current, final_roll_list, output, no_20)
     return roll
 
 def explode(result, die):

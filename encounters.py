@@ -10,6 +10,7 @@ class Encounter:
         self.enemies = []
         self.conscious_enemies = []
         self.initiative_order = []
+        self.player_output = {}
 
     def play(self):
         #get initiatives for turn order
@@ -68,3 +69,6 @@ class Encounter:
             print('-----')
             #input('Press enter to continue...') if not finished else print()
             rnd += 1
+        for character in self.players:
+            self.player_output[character.name] = character.lethal
+        return self.player_output
