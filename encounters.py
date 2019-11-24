@@ -26,6 +26,8 @@ class Encounter:
             self.conscious_enemies.append(enemy)
             self.initiative_order.append((enemy, dice.attr_roll(enemy.init, 0).total))
 
+        print(', '.join([x.name for x in self.conscious_players]), 'are facing off against', ', '.join([x.name for x in self.conscious_enemies]))
+
         #Sort the initiative list
         self.initiative_order.sort(key=lambda x: x[1], reverse=True)
         rnd = 1

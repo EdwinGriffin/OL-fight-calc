@@ -1,0 +1,5 @@
+name,level,role,init,fort,offensive,defensive,buffing,debuffing,hp,guard,resolve,bonus,lethal
+Breach,3,debuffer,5,3,6,6,6,6,22,19,13,6,0
+AC,3,attacker,3,3,6,6,6,6,26,19,15,6,0
+Donk/Dunk,3,attacker,3,5,6,6,6,6,20,20,10,6,1
+Actual,3,buffer,4,3,4,6,6,6,34,19,19,6,5

@@ -44,7 +44,7 @@ class Character:
                     target = enemy
                 
                 if type(self) is NPC:
-                   if enemy.current_hp > target.current_hp:
+                    if enemy.current_hp + enemy.guard > target.current_hp + target.guard:
                        target = enemy
 
         if target.name == 'empty':
@@ -234,7 +234,10 @@ class Character:
 
         #Debuff the highest priority target
         if debuff_priority:
-            debuff_priority.sort(key=lambda x: x.offensive)
+            if type(self) == NPC:
+                debuff_priority.sort(key=lambda x: x.current_hp)
+            else:
+                debuff_priority.sort(key=lambda x: x.offensive)
             target = debuff_priority[0]
             print(self.name, 'is attempting to debuff', target.name, 'with:', debuff_roll)
             if debuff_roll.total >= target.resolve:
