@@ -1,9 +1,8 @@
 name, level, role (1 = attacker; 2 = buffer; 3 = debuffer)
-Cleaner1, 2, 1
-Cleaner1, 2, 1
-Cleaner1, 2, 3
-Cleaner1, 2, 3
-Cleaner1, 2, 1
-Cleaner1, 2, 1
-Cleaner1, 2, 3
-Cleaner1, 2, 3
+RioterBoss,2,1
+riotermook,1,1
+riotermook,1,2
+riotermook,1,3
+riotermook,1,1
+riotermook,1,2
+riotermook,1,3

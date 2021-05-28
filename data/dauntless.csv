@@ -1,5 +1,5 @@
 name, level, role, init, fort, offensive, defensive, buffing, debuffing, hp, guard, resolve, bonus, lethal
-Grue,3,debuffer,3,3,6,6,3,6,26,17,15,6,0
-Blockade,3,buffer,3,3,5,6,6,0,36,21,20,6,0
-Lockstep,3,attacker,5,2,6,6,6,0,20,19,13,8,4
-Fulcrum,3,attacker,3,4,6,6,0,0,34,21,18,6,6
+Grue,5,debuffer,5,3,7,7,3,7,28,19,16,9,0
+Blockade,5,buffer,3,3,6,7,7,0,38,22,21,9,0
+Lockstep,5,attacker,5,4,7,7,7,0,26,20,14,9,0
+Fulcrum,5,attacker,4,5,7,7,0,0,36,23,18,9,9
